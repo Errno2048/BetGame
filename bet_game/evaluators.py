@@ -1,5 +1,5 @@
 import numpy as _np
-from collections import Iterable as _Iterable
+from collections.abc import Iterable as _Iterable
 from . import utils as _utils
 
 def constant(value):
