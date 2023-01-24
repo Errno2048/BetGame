@@ -1,4 +1,4 @@
-from collections import Iterable as _Iterable
+from collections.abc import Iterable as _Iterable
 import numpy as _np
 import math as _math
 
