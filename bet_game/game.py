@@ -236,7 +236,7 @@ class Game:
         if self.status == self.STATUS_104_EVALUATE_BET:
             player_infos = [
                 f'{player} (result: {player.current_value}){" (decreased)" if player.score_decreased else ""} {"betting " + str(player.stake) + " point" + ("s" if player.stake > 1 else "") + " on " + player.bet if player.bet != player.id else "not betting"}'
-                for player in self.members.values()
+                for player in sorted(self.members.values(), key=lambda x: x.current_value, reverse=True)
             ]
         else:
             player_infos = [f'{player}' for player in self.members.values()]
