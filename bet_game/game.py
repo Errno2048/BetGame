@@ -156,7 +156,7 @@ class Game:
     @property
     def score_baseline(self):
         n = len(self.members)
-        return _math.ceil((n + 1) / 3)
+        return _math.floor(n / 2)
 
     @property
     def max_stake(self):
@@ -170,10 +170,12 @@ class Game:
         baseline = self.score_baseline
 
         for ranking, player in enumerate(members):
-            score = ranking + 1 - baseline
+            score = max(ranking + 1 - baseline, 0)
             player.score += score
             if player.score_decreased:
                 player.score -= self.decrease_score_value
+            if player.bet is not None and player.bet != player.id:
+                self.members[player.bet].score -= 1
 
         self.status = self.STATUS_104_EVALUATE_BET
 
@@ -201,7 +203,7 @@ class Game:
                 bet_player = self.members[bet]
                 if bet_player.score == _top_score:
                     delta_score[index] += player.stake
-                    delta_score[player_index[bet]] -= 1
+                    #delta_score[player_index[bet]] -= 1
                 else:
                     delta_score[index] -= player.stake
         for index, player in enumerate(members):
@@ -223,6 +225,8 @@ class Game:
         head = ''
         if self.status == self.STATUS_100_DRAW_QUEST:
             head = f'Drawing the next quest.\n'
+        elif self.status == self.STATUS_101_BET:
+            head = f'The quest is {self.current_quest.description}. Players are betting.\n'
         elif self.status == self.STATUS_102_PLAY:
             head = f'Playing {self.current_quest.description}.\n'
         elif self.status == self.STATUS_103_EVALUATE_SCORE:

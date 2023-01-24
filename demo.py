@@ -47,7 +47,7 @@ print(game, '\n')
 # 下注的最大值为game.max_stake
 game.bet('player1', 'player2', 2)
 
-game.bet('player2', 'player1', 1)
+game.bet('player2', 'player3', 1)
 game.bet('player3', 'player1', 1)
 
 # player4选择不下注，当所有玩家下注完毕后进入打歌阶段
