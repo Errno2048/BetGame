@@ -213,10 +213,11 @@ class Game:
             if bet is None:
                 delta_score[index] += 0
             else:
-                if top_id == player.id:
-                    _top_score = second_top_score
-                else:
-                    _top_score = top_score
+                #if top_id == player.id:
+                #    _top_score = second_top_score
+                #else:
+                #    _top_score = top_score
+                _top_score = top_score
                 bet_player = self.members[bet]
                 if bet_player.score == _top_score:
                     delta_score[index] += player.stake
