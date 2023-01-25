@@ -5,7 +5,13 @@ import re as _re
 
 from .. import utils as _utils, QuestInfo as _QuestInfo, evaluators as _evaluators
 
-def phigros_score(score, perfect, good, bad, miss, combo):
+def phigros_score(
+    score, 
+    perfect = 0, 
+    good = 0, 
+    bad = 0, 
+    miss = 0,
+    combo = 0):
     return _np.array([score, perfect, good, bad, miss, combo])
 
 # Considers only score
@@ -126,7 +132,7 @@ class SongPackageManager:
                     _level_songs = levels.setdefault(level, [])
                     _level_songs.extend(songs)
             self.__quest_list_cache = levels
-        level_weights = {k : 1.0 for k in levels.keys()}
+        level_weights = {k : 0.0 for k in levels.keys()}
         difficulty_enabled = [True, True, True, True]
         ban_song_id = set()
         for i in range(0, len(args), 2):
@@ -142,11 +148,11 @@ class SongPackageManager:
                     mode = 1
                 else:
                     difficulties = {'EZ': 0, 'HD': 1, 'IN': 2, 'AT': 3}
-                    _arg1 = arg1.lower()
+                    _arg1 = arg1.upper()
                     if _arg1 in difficulties:
                         mode = 2
                         arg1 = _arg1
-                    elif _arg1 == 'ban':
+                    elif _arg1 == 'BAN':
                         mode = 3
 
             if mode == 1:

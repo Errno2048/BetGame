@@ -1,26 +1,23 @@
 from bet_game.quest_generator.phigros import song_package_manager, phigros_score
 from bet_game import Game, Player
 
-song_package_manager.enable('Single-单曲精选集')
-song_package_manager.enable('Chapter Legacy 过去的章节')
-song_package_manager.enable('Chapter 4 管道迷宫')
-song_package_manager.enable('Chapter 5 霓虹灯牌')
-song_package_manager.enable('Chapter 6 方舟蜃景')
-song_package_manager.enable('Chapter 7 时钟链接')
+song_package_manager.enable_all()
 
 regular_quests = song_package_manager.quest_list(
     'EZ', False,
     'HD', False,
     'IN', True,
     'AT', True,
-    '13', 1.0,
-    '14', 2.0,
-    '15', 3.0, # 15级歌曲的总权重为3.0，默认为1.0
+    '14', 1.5,
+    '15', 1.5,
     '16', 1.0,
-    # 'ban', 'Sigma (Haocore Mix) ~ Regrets of The Yellow Tulip ~',
-    # 'ban', 'Sigma (Haocore Mix) ~ 105秒の伝説 ~',
-    # 'ban', 'Spasmodic(Haocore Mix)',
-    # 'ban', 'Introduction',
+    'ban', 'もぺもぺ'
+    'ban', 'Break Over'
+
+    'ban', 'Sigma (Haocore Mix) ~ Regrets of The Yellow Tulip ~',
+    'ban', 'Sigma (Haocore Mix) ~ 105秒の伝説 ~',
+    'ban', 'Spasmodic(Haocore Mix)',
+    'ban', 'Introduction',
     # 以上四首在特殊曲包内，选定曲包的话不用ban
 )
 
@@ -44,10 +41,8 @@ print(game, '\n')
 # 否则player1失去2分
 # 下注的最大值为game.max_stake
 game.bet('player1', 'player2', 2)
-
 game.bet('player2', 'player3', 1)
 game.bet('player3', 'player1', 1)
-
 # player4选择不下注，当所有玩家下注完毕后进入打歌阶段
 game.bet('player4', None)
 
