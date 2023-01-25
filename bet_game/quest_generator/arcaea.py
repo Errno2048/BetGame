@@ -5,7 +5,12 @@ import re as _re
 
 from .. import utils as _utils, QuestInfo as _QuestInfo, evaluators as _evaluators
 
-def arcaea_score(score, pure, far, lost, combo):
+def arcaea_score(
+    score, 
+    pure = 0, 
+    far = 0, 
+    lost = 0, 
+    combo = 0):
     return _np.array([score, pure, far, lost, combo])
 
 # Considers only score
