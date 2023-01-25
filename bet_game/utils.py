@@ -23,6 +23,11 @@ def check_type(value, type, info='Invalid type'):
         raise SettingsError(f'{info} {value.__class__} : {value}')
 
 def multiplier_transform(value : _np.ndarray, multiplier : _np.ndarray) -> _np.ndarray:
+    if not isinstance(value, _np.ndarray):
+        if not isinstance(value, _Iterable):
+            value = _np.array([value])
+        else:
+            value = _np.array(value)
     base_value = _np.ones_like(value)
     res = _np.zeros_like(value)
     for index in range(multiplier.shape[0]):

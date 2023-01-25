@@ -141,6 +141,10 @@ class Game:
         if player.current_value is not None:
             raise _utils.GameplayError(f'The player (ID {player_id}) has already completed the quest')
         value = self.current_quest.evaluator(scores)
+        if isinstance(value, _np.ndarray):
+            if not value.size == 1:
+                raise _utils.GameplayError(f'Invalid evaluated score: {value}')
+            value = value.item()
         player.current_value = value
         self.playing_player_num -= 1
         if self.playing_player_num <= 0:

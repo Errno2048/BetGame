@@ -14,6 +14,15 @@ def score_value(score_index):
         return scores[score_index]
     return evaluator
 
+def multiply(multiplier : _np.ndarray, evaluator):
+    if not isinstance(multiplier, _Iterable):
+        multiplier = [0.0, multiplier]
+    multiplier = _utils.check_ndarray(multiplier)
+    _eval = evaluator
+    def evaluator(scores : _np.ndarray):
+        return _utils.multiplier_transform(_eval(scores), multiplier)
+    return evaluator
+
 def by_score(score_index, *score_list):
     if len(score_list) == 0:
         raise _utils.SettingsError(f'Invalid arguments for by_score generator: {score_list}')
