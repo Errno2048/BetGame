@@ -179,7 +179,7 @@ class Game:
 
         baseline = self.score_baseline
 
-        for index, player in reversed(enumerate(members)):
+        for index, player in reversed(list(enumerate(members))):
             if index < len(members) - 1 and members[index] == members[index + 1]:
                 rankings[index] = rankings[index + 1]
             ranking = rankings[index]
