@@ -18,5 +18,8 @@ class Player:
             return self.current_value < other.current_value
         return self.score > other.score
 
+    def __eq__(self, other):
+        return self.current_value == other.current_value and self.score == other.score
+
     def __str__(self):
         return f'{self.id} ({self.score})'

@@ -1,4 +1,4 @@
-from collections import Iterable as _Iterable
+from collections.abc import Iterable as _Iterable
 import numpy as _np
 import math as _math
 
@@ -58,7 +58,13 @@ class Game:
         return self.status == self.STATUS_200_FINISHED
 
     def draw_quest(self):
-        self.check_status(self.STATUS_100_DRAW_QUEST)
+        if self.status == self.STATUS_101_BET:
+            if self.playing_player_num != len(self.members):
+                raise _utils.GameplayError(f'Cannot redraw quests. Some players have already bet')
+            redraw = True
+        else:
+            self.check_status(self.STATUS_100_DRAW_QUEST)
+            redraw = False
 
         weights = _np.array([q.weight for q in self.quest_pool])
         total_pool_size = len(self.quest_pool)
@@ -71,7 +77,10 @@ class Game:
 
         self.status = self.STATUS_101_BET
 
-        self.log(f'{self.turns} turn{"s" if self.turns > 1 else ""} left. Drawing quest: {self.current_quest.description}.')
+        if redraw:
+            self.log(f'Redrawing quest: {self.current_quest.description}.')
+        else:
+            self.log(f'{self.turns} turn{"s" if self.turns > 1 else ""} left. Drawing quest: {self.current_quest.description}.')
         return self.current_quest
 
     @property
@@ -132,6 +141,10 @@ class Game:
         if player.current_value is not None:
             raise _utils.GameplayError(f'The player (ID {player_id}) has already completed the quest')
         value = self.current_quest.evaluator(scores)
+        if isinstance(value, _np.ndarray):
+            if not value.size == 1:
+                raise _utils.GameplayError(f'Invalid evaluated score: {value}')
+            value = value.item()
         player.current_value = value
         self.playing_player_num -= 1
         if self.playing_player_num <= 0:
@@ -156,7 +169,7 @@ class Game:
     @property
     def score_baseline(self):
         n = len(self.members)
-        return _math.ceil((n + 1) / 3)
+        return _math.floor(n / 2)
 
     @property
     def max_stake(self):
@@ -166,14 +179,20 @@ class Game:
         self.check_status(self.STATUS_103_EVALUATE_SCORE)
 
         members = sorted(self.members.values(), reverse=False)
+        rankings = list(range(len(members)))
 
         baseline = self.score_baseline
 
-        for ranking, player in enumerate(members):
-            score = ranking + 1 - baseline
+        for index, player in reversed(list(enumerate(members))):
+            if index < len(members) - 1 and members[index] == members[index + 1]:
+                rankings[index] = rankings[index + 1]
+            ranking = rankings[index]
+            score = max(ranking + 1 - baseline, 0)
             player.score += score
             if player.score_decreased:
                 player.score -= self.decrease_score_value
+            if player.bet is not None and player.bet != player.id:
+                self.members[player.bet].score -= 1
 
         self.status = self.STATUS_104_EVALUATE_BET
 
@@ -194,14 +213,15 @@ class Game:
             if bet is None:
                 delta_score[index] += 0
             else:
-                if top_id == player.id:
-                    _top_score = second_top_score
-                else:
-                    _top_score = top_score
+                #if top_id == player.id:
+                #    _top_score = second_top_score
+                #else:
+                #    _top_score = top_score
+                _top_score = top_score
                 bet_player = self.members[bet]
                 if bet_player.score == _top_score:
                     delta_score[index] += player.stake
-                    delta_score[player_index[bet]] -= 1
+                    #delta_score[player_index[bet]] -= 1
                 else:
                     delta_score[index] -= player.stake
         for index, player in enumerate(members):
@@ -223,6 +243,8 @@ class Game:
         head = ''
         if self.status == self.STATUS_100_DRAW_QUEST:
             head = f'Drawing the next quest.\n'
+        elif self.status == self.STATUS_101_BET:
+            head = f'The quest is {self.current_quest.description}. Players are betting.\n'
         elif self.status == self.STATUS_102_PLAY:
             head = f'Playing {self.current_quest.description}.\n'
         elif self.status == self.STATUS_103_EVALUATE_SCORE:
@@ -232,7 +254,7 @@ class Game:
         if self.status == self.STATUS_104_EVALUATE_BET:
             player_infos = [
                 f'{player} (result: {player.current_value}){" (decreased)" if player.score_decreased else ""} {"betting " + str(player.stake) + " point" + ("s" if player.stake > 1 else "") + " on " + player.bet if player.bet != player.id else "not betting"}'
-                for player in self.members.values()
+                for player in sorted(self.members.values(), key=lambda x: x.current_value, reverse=True)
             ]
         else:
             player_infos = [f'{player}' for player in self.members.values()]

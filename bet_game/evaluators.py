@@ -1,5 +1,5 @@
 import numpy as _np
-from collections import Iterable as _Iterable
+from collections.abc import Iterable as _Iterable
 from . import utils as _utils
 
 def constant(value):
@@ -12,6 +12,15 @@ def constant(value):
 def score_value(score_index):
     def evaluator(scores : _np.ndarray):
         return scores[score_index]
+    return evaluator
+
+def multiply(multiplier : _np.ndarray, evaluator):
+    if not isinstance(multiplier, _Iterable):
+        multiplier = [0.0, multiplier]
+    multiplier = _utils.check_ndarray(multiplier)
+    _eval = evaluator
+    def evaluator(scores : _np.ndarray):
+        return _utils.multiplier_transform(_eval(scores), multiplier)
     return evaluator
 
 def by_score(score_index, *score_list):
