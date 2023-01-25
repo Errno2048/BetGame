@@ -58,7 +58,13 @@ class Game:
         return self.status == self.STATUS_200_FINISHED
 
     def draw_quest(self):
-        self.check_status(self.STATUS_100_DRAW_QUEST)
+        if self.status == self.STATUS_101_BET:
+            if self.playing_player_num != len(self.members):
+                raise _utils.GameplayError(f'Cannot redraw quests. Some players have already bet')
+            redraw = True
+        else:
+            self.check_status(self.STATUS_100_DRAW_QUEST)
+            redraw = False
 
         weights = _np.array([q.weight for q in self.quest_pool])
         total_pool_size = len(self.quest_pool)
@@ -71,7 +77,10 @@ class Game:
 
         self.status = self.STATUS_101_BET
 
-        self.log(f'{self.turns} turn{"s" if self.turns > 1 else ""} left. Drawing quest: {self.current_quest.description}.')
+        if redraw:
+            self.log(f'Redrawing quest: {self.current_quest.description}.')
+        else:
+            self.log(f'{self.turns} turn{"s" if self.turns > 1 else ""} left. Drawing quest: {self.current_quest.description}.')
         return self.current_quest
 
     @property
