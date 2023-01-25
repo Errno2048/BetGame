@@ -166,10 +166,14 @@ class Game:
         self.check_status(self.STATUS_103_EVALUATE_SCORE)
 
         members = sorted(self.members.values(), reverse=False)
+        rankings = list(range(len(members)))
 
         baseline = self.score_baseline
 
-        for ranking, player in enumerate(members):
+        for index, player in reversed(enumerate(members)):
+            if index < len(members) - 1 and members[index] == members[index + 1]:
+                rankings[index] = rankings[index + 1]
+            ranking = rankings[index]
             score = max(ranking + 1 - baseline, 0)
             player.score += score
             if player.score_decreased:
