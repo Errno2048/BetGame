@@ -34,7 +34,7 @@ def regular_arcaea_quest(song, weight):
 
     return _QuestInfo(weight, description, regular_arcaea_evaluator)
 
-_song_package_file = _os.path.dirname(_os.path.abspath(__file__)) + _os.path.sep + 'songlist'
+_song_package_file = _os.path.dirname(_os.path.abspath(__file__)) + _os.path.sep + 'arcaea_songlist'
 with open(_song_package_file, 'r', encoding='utf8') as f:
     _song_package_raw = _json.load(f)
     _song_package = {}
